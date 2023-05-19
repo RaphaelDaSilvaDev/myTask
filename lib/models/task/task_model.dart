@@ -9,6 +9,8 @@ class Task {
   bool isDone;
   bool isArchived;
   DateTime createdAt;
+  DateTime? finishedAt;
+  DateTime? doAt;
 
   Task(
       {this.id = 0,
@@ -16,6 +18,8 @@ class Task {
       this.description,
       this.isDone = false,
       this.isArchived = false,
+      this.finishedAt,
+      this.doAt,
       DateTime? createdAt})
       : createdAt = createdAt ?? DateTime.now();
 

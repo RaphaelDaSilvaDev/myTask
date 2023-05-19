@@ -31,3 +31,19 @@ const Color indigo300 = Color(0xff7986CB);
 const Color purple300 = Color(0xffBA68C8);
 
 const Color pink300 = Color(0xffF06292);
+
+const MaterialColor blueTheme = MaterialColor(
+  0xff99CDFA,
+  <int, Color>{
+    50: Color(0xffC0E0FC),
+    100: Color(0xffC0E0FC),
+    200: Color(0xff99CDFA),
+    300: Color(0xff73BAF7),
+    400: Color(0xff59AAF6),
+    500: Color(0xff99CDFA),
+    600: Color(0xff59AAF6),
+    700: Color(0xff59AAF6),
+    800: Color(0xff59AAF6),
+    900: Color(0xff59AAF6),
+  },
+);

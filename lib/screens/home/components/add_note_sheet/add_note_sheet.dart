@@ -1,11 +1,11 @@
 // ignore_for_file: no_logic_in_create_state
-
 import 'package:flutter/material.dart';
 import 'package:my_tasks/constants/colors.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
+import 'package:my_tasks/screens/home/components/add_note_sheet/components/do_at_buttons.dart';
 import 'package:provider/provider.dart';
 
-import '../../../models/task/task_model.dart';
+import '../../../../models/task/task_model.dart';
 
 class AddNoteSheet extends StatefulWidget {
   const AddNoteSheet({super.key, this.task});
@@ -31,6 +31,12 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
     }
 
     Navigator.of(context).pop();
+  }
+
+  changeTime(DateTime dateTime) {
+    setState(() {
+      task.doAt = dateTime;
+    });
   }
 
   @override
@@ -130,6 +136,23 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                         ),
                       ],
                     ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: 32,
+                  child: ListView(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      DoAtButton(
+                        task: task,
+                        changeTime: changeTime,
+                      )
+                    ],
                   ),
                 ),
               ],

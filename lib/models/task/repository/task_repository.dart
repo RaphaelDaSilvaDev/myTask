@@ -20,7 +20,8 @@ class TaskRepository extends ChangeNotifier {
   }
 
   save(Task task) async {
-    final newTask = Task(title: task.title, description: task.description);
+    final newTask =
+        Task(title: task.title, description: task.description, doAt: task.doAt);
     final box = await getBox();
     box.put(newTask);
     tasks.add(newTask);
@@ -30,12 +31,6 @@ class TaskRepository extends ChangeNotifier {
   update(Task task) async {
     final box = await getBox();
     box.put(task);
-    /*  final newTask = Task(
-        title: task.title,
-        id: task.id,
-        createdAt: task.createdAt,
-        isDone: task.isDone);
-    tasks.replaceRange(tasks.indexOf(task), tasks.indexOf(task) + 1, [newTask]); */
     notifyListeners();
   }
 
