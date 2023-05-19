@@ -48,6 +48,14 @@ class taskRowWidget extends StatelessWidget {
                       fontWeight: FontWeight.w300,
                       color: gray900),
                 ),
+                if (task.description != null && task.description!.isNotEmpty)
+                  Text(
+                    task.description!,
+                    style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        color: gray900),
+                  ),
                 Text(
                   DateFormat.jm().format(task.createdAt),
                   style: const TextStyle(

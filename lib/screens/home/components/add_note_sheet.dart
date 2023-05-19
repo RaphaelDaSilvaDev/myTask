@@ -14,24 +14,20 @@ class AddNoteSheet extends StatefulWidget {
 
   @override
   State<AddNoteSheet> createState() => _AddNoteSheetState(
-      taskTitle: task?.title ?? "",
-      editTask: task != null ? true : false,
-      task: task);
+      editTask: task != null ? true : false, task: task ?? Task(title: ""));
 }
 
 class _AddNoteSheetState extends State<AddNoteSheet> {
   bool? editTask = false;
-  Task? task;
-  String? taskTitle = "";
+  Task task;
 
-  _AddNoteSheetState({this.taskTitle, this.editTask, this.task});
+  _AddNoteSheetState({this.editTask, required this.task});
 
   save() async {
     if (editTask == false) {
-      context.read<taskRepository>().save(taskTitle!);
+      context.read<TaskRepository>().save(task);
     } else {
-      task?.title = taskTitle!;
-      context.read<taskRepository>().update(task!);
+      context.read<TaskRepository>().update(task);
     }
 
     Navigator.of(context).pop();
@@ -73,29 +69,62 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SizedBox(
-                              width: MediaQuery.of(context).size.width - 120,
-                              child: TextFormField(
-                                maxLines: 2,
-                                minLines: 1,
-                                initialValue: taskTitle,
-                                decoration: const InputDecoration(
-                                    isCollapsed: true,
-                                    hintText: "Nome da Tarefa",
-                                    border: InputBorder.none),
-                                onChanged: (value) {
-                                  setState(() {
-                                    taskTitle = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Text(
-                              task?.createdAt.toString() ?? "",
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w300,
-                                  color: gray500),
+                            Wrap(
+                              runSpacing: 10,
+                              spacing: 10,
+                              direction: Axis.vertical,
+                              children: [
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width - 120,
+                                  child: TextFormField(
+                                    maxLines: 2,
+                                    minLines: 1,
+                                    initialValue: task.title,
+                                    style: const TextStyle(
+                                        fontSize: 18, color: gray900),
+                                    decoration: const InputDecoration(
+                                      isCollapsed: true,
+                                      hintText: "Nome da Tarefa",
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        task.title = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width - 120,
+                                  child: TextFormField(
+                                    maxLines: 4,
+                                    minLines: 1,
+                                    initialValue: task.description,
+                                    style: const TextStyle(
+                                        fontSize: 14, color: gray900),
+                                    decoration: const InputDecoration(
+                                      isCollapsed: true,
+                                      hintText: "Descrição...",
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        task.description = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                if (editTask == true)
+                                  Text(
+                                    task.createdAtFormated.toString(),
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                        color: gray500),
+                                  ),
+                              ],
                             ),
                           ],
                         ),
@@ -108,7 +137,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
             Align(
               alignment: Alignment.bottomRight,
               child: FloatingActionButton(
-                onPressed: taskTitle!.isNotEmpty
+                onPressed: task.title.isNotEmpty
                     ? () {
                         save();
                       }
@@ -119,7 +148,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                   decoration: BoxDecoration(
                       borderRadius: const BorderRadius.all(Radius.circular(18)),
                       gradient: LinearGradient(
-                          colors: taskTitle!.isNotEmpty
+                          colors: task.title.isNotEmpty
                               ? [blue200, blue400]
                               : [gray300, gray500],
                           begin: Alignment.topLeft,
