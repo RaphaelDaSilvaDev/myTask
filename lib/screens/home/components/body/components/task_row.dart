@@ -1,11 +1,11 @@
 // ignore_for_file: camel_case_types, must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/models/task/task_model.dart';
 
 import '../../../../../constants/colors.dart';
-import '../../add_note_sheet.dart';
+import '../../add_note_sheet/add_note_sheet.dart';
 
 class taskRowWidget extends StatelessWidget {
   var isChecked = false;
@@ -15,6 +15,16 @@ class taskRowWidget extends StatelessWidget {
   taskRowWidget({super.key, required this.task, required this.updatedChecked});
   @override
   Widget build(BuildContext context) {
+    var isBeforeToday = Jiffy.parse(task.doAt != null
+            ? task.doAt!.toString()
+            : DateTime.now().toString())
+        .isBefore(Jiffy.now()
+            .startOf(Unit.day)
+            .add(hours: 23, minutes: 59, seconds: 59));
+
+    var isAfterToday = task.doAt != null &&
+        Jiffy.parse(task.doAt.toString()).isBefore(Jiffy.now());
+
     return Card(
       color: Colors.transparent,
       elevation: 0,
@@ -54,14 +64,18 @@ class taskRowWidget extends StatelessWidget {
                     style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w300,
-                        color: gray900),
+                        color: gray500),
                   ),
                 Text(
-                  DateFormat.jm().format(task.createdAt),
-                  style: const TextStyle(
+                  task.doAt != null
+                      ? isBeforeToday
+                          ? Jiffy.parse(task.doAt.toString()).fromNow()
+                          : Jiffy.parse(task.doAt.toString()).MMMMEEEEd
+                      : "Sem Data para Expirar",
+                  style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w300,
-                      color: gray500),
+                      color: isAfterToday ? red300 : gray500),
                 )
               ],
             ),
@@ -84,6 +98,7 @@ class taskRowWidget extends StatelessWidget {
               value: task.isDone,
               onChanged: (bool? value) {
                 task.isDone = value!;
+                task.finishedAt = DateTime.now();
                 updatedChecked(task);
               },
             ),

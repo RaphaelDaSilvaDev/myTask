@@ -3,7 +3,7 @@ import 'package:my_tasks/constants/colors.dart';
 import 'package:my_tasks/screens/home/components/app_bar.dart';
 import 'package:my_tasks/screens/home/components/body/home_body.dart';
 
-import 'components/add_note_sheet.dart';
+import 'components/add_note_sheet/add_note_sheet.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
