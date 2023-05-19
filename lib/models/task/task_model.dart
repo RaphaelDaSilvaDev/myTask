@@ -1,14 +1,23 @@
+import 'package:intl/intl.dart';
+import 'package:objectbox/objectbox.dart';
+
+@Entity()
 class Task {
-  String? id;
+  int id;
   String title;
+  String? description;
   bool isDone;
   bool isArchived;
   DateTime createdAt;
 
   Task(
-      {this.id,
+      {this.id = 0,
       required this.title,
+      this.description,
       this.isDone = false,
       this.isArchived = false,
-      required this.createdAt});
+      DateTime? createdAt})
+      : createdAt = createdAt ?? DateTime.now();
+
+  String get createdAtFormated => DateFormat.jm().format(createdAt);
 }

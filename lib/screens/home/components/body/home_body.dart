@@ -17,7 +17,6 @@ class homeBodyWidget extends StatefulWidget {
 
 class _homeBodyWidgetState extends State<homeBodyWidget> {
   final loading = ValueNotifier(true);
-  final taskList = taskRepository().tasks;
 
   @override
   void initState() {
@@ -29,11 +28,11 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
   }
 
   getFilterTodos() async {
-    await context.read<taskRepository>().getAll();
+    await context.read<TaskRepository>().getAll();
   }
 
   updatedChecked(Task task) async {
-    await context.read<taskRepository>().update(task);
+    await context.read<TaskRepository>().update(task);
   }
 
   @override
@@ -44,7 +43,7 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
         child: ValueListenableBuilder(
           valueListenable: loading,
           builder: (context, load, _) =>
-              Consumer<taskRepository>(builder: (context, repository, child) {
+              Consumer<TaskRepository>(builder: (context, repository, child) {
             final tasks = repository.tasks;
 
             if (load) {
