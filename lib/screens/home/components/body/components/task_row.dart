@@ -5,7 +5,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/models/task/task_model.dart';
 
 import '../../../../../constants/colors.dart';
-import '../../add_note_sheet/add_note_sheet.dart';
+import '../../open_bottom_sheet.dart';
 
 class taskRowWidget extends StatelessWidget {
   var isChecked = false;
@@ -32,14 +32,10 @@ class taskRowWidget extends StatelessWidget {
         onTap: task.isDone
             ? null
             : () {
-                showModalBottomSheet(
-                    backgroundColor: Colors.transparent,
+                openBottomSheet(
                     context: context,
-                    useSafeArea: false,
-                    isScrollControlled: true,
-                    builder: (_) => AddNoteSheet(
-                          task: task,
-                        ));
+                    task: task,
+                    updatedChecked: updatedChecked);
               },
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(24))),
@@ -59,12 +55,19 @@ class taskRowWidget extends StatelessWidget {
                       color: gray900),
                 ),
                 if (task.description != null && task.description!.isNotEmpty)
-                  Text(
-                    task.description!,
-                    style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                        color: gray500),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 45,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Text(
+                        task.description!,
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: gray500),
+                      ),
+                    ),
                   ),
                 Text(
                   task.doAt != null

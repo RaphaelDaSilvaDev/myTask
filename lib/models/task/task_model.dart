@@ -1,4 +1,7 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:intl/intl.dart';
+import 'package:my_tasks/models/subtask/subtask_model.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -8,6 +11,7 @@ class Task {
   String? description;
   bool isDone;
   bool isArchived;
+  final subtasks = ToMany<SubTask>();
   DateTime createdAt;
   DateTime? finishedAt;
   DateTime? doAt;
@@ -20,6 +24,7 @@ class Task {
       this.isArchived = false,
       this.finishedAt,
       this.doAt,
+      ToMany<SubTask>? subtasks,
       DateTime? createdAt})
       : createdAt = createdAt ?? DateTime.now();
 
