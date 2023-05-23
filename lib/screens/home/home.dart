@@ -3,7 +3,7 @@ import 'package:my_tasks/constants/colors.dart';
 import 'package:my_tasks/screens/home/components/app_bar.dart';
 import 'package:my_tasks/screens/home/components/body/home_body.dart';
 
-import 'components/add_note_sheet/add_note_sheet.dart';
+import 'components/open_bottom_sheet.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,17 +11,13 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: gray300,
       appBar: appBarWidget(),
       body: const homeBodyWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          showModalBottomSheet(
-              backgroundColor: Colors.transparent,
-              context: context,
-              useSafeArea: false,
-              isScrollControlled: true,
-              builder: (_) => const AddNoteSheet());
+          openBottomSheet(context: context);
         },
         child: Container(
           width: 60,

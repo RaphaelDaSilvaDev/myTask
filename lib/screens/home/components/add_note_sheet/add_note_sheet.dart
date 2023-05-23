@@ -1,11 +1,14 @@
 // ignore_for_file: no_logic_in_create_state
 import 'package:flutter/material.dart';
 import 'package:my_tasks/constants/colors.dart';
+import 'package:my_tasks/models/subtask/repository/subtask_repository.dart';
+import 'package:my_tasks/models/subtask/subtask_model.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
-import 'package:my_tasks/screens/home/components/add_note_sheet/components/do_at_buttons.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/task/task_model.dart';
+import 'components/do_at_buttons.dart';
+import 'components/subtask_row.dart';
 
 class AddNoteSheet extends StatefulWidget {
   const AddNoteSheet({super.key, this.task});
@@ -20,10 +23,20 @@ class AddNoteSheet extends StatefulWidget {
 class _AddNoteSheetState extends State<AddNoteSheet> {
   bool? editTask = false;
   Task task;
-
+  final ScrollController _controller = ScrollController();
   _AddNoteSheetState({this.editTask, required this.task});
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _controller.jumpTo(_controller.position.maxScrollExtent);
+    });
+  }
+
   save() async {
+    task.subtasks
+        .map((element) => context.read<SubtaskRepository>().save(element));
     if (editTask == false) {
       context.read<TaskRepository>().save(task);
     } else {
@@ -31,6 +44,13 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
     }
 
     Navigator.of(context).pop();
+  }
+
+  addSubtask(SubTask subtask) {
+    setState(() {
+      task.subtasks.add(subtask);
+      _controller.jumpTo(_controller.position.maxScrollExtent);
+    });
   }
 
   changeTime(DateTime dateTime) {
@@ -121,6 +141,24 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                                       });
                                     },
                                   ),
+                                ),
+                                if (task.subtasks.isNotEmpty)
+                                  SizedBox(
+                                    width:
+                                        MediaQuery.of(context).size.width - 60,
+                                    height: 90,
+                                    child: ListView(
+                                      controller: _controller,
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      children: [
+                                        for (var subtask in task.subtasks)
+                                          SubtaskRow(subtask: subtask)
+                                      ],
+                                    ),
+                                  ),
+                                SubtaskRow(
+                                  addSubtask: addSubtask,
                                 ),
                                 if (editTask == true)
                                   Text(
