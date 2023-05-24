@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:my_tasks/models/subtask/subtask_model.dart';
 
 import '../../../../../constants/colors.dart';
@@ -58,18 +57,23 @@ class _SubtaskRowState extends State<SubtaskRow> {
           ),
           SizedBox(
             width: MediaQuery.of(context).size.width - 150,
-            child: RawKeyboardListener(
-              focusNode: FocusNode(onKey: (node, event) {
-                if (event.isKeyPressed(LogicalKeyboardKey.enter)) {
-                  return KeyEventResult
-                      .handled; // prevent passing the event into the TextField
-                }
-                return KeyEventResult
-                    .ignored; // pass the event to the TextField
-              }),
-              onKey: (event) {
-                if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
-                    title.text.isNotEmpty) {
+            child: TextFormField(
+              maxLines: 1,
+              minLines: 1,
+              controller: title,
+              style: TextStyle(
+                  fontSize: 14,
+                  color:
+                      widget.subtask?.isDone != null && widget.subtask!.isDone
+                          ? gray500
+                          : gray900),
+              decoration: const InputDecoration(
+                isCollapsed: true,
+                hintText: "Subtarefa...",
+                border: InputBorder.none,
+              ),
+              onFieldSubmitted: (value) {
+                if (value.isNotEmpty) {
                   if (widget.subtask == null) {
                     widget.addSubtask!(SubTask(title: title.text));
                   } else {
@@ -80,22 +84,6 @@ class _SubtaskRowState extends State<SubtaskRow> {
                   });
                 }
               },
-              child: TextFormField(
-                maxLines: 1,
-                minLines: 1,
-                controller: title,
-                style: TextStyle(
-                    fontSize: 14,
-                    color:
-                        widget.subtask?.isDone != null && widget.subtask!.isDone
-                            ? gray500
-                            : gray900),
-                decoration: const InputDecoration(
-                  isCollapsed: true,
-                  hintText: "Subtarefa...",
-                  border: InputBorder.none,
-                ),
-              ),
             ),
           ),
         ],

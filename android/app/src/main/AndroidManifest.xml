@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cubixapplications.my_tasks">
    <application
-        android:label="my_tasks"
+        android:label="My Task"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
