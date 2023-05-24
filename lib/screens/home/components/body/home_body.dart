@@ -1,6 +1,7 @@
-// ignore_for_file: camel_case_types
+// ignore_for_file: camel_case_types, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:my_tasks/models/subtask/repository/subtask_repository.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
 import 'package:my_tasks/screens/home/components/body/components/task_row.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +33,22 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
   }
 
   updatedChecked(Task task) async {
-    await context.read<TaskRepository>().update(task);
+    if (task.subtasks.isNotEmpty) {
+      for (var subtask in task.subtasks) {
+        await context.read<SubtaskRepository>().save(subtask);
+      }
+    }
+
+    if (task.subtasks.where((element) => element.isDone == true).length ==
+        task.subtasks.length) {
+      task.isDone = true;
+      task.finishedAt = DateTime.now();
+    } else {
+      task.isDone = false;
+      task.finishedAt = null;
+    }
+
+    await context.read<TaskRepository>().save(task);
   }
 
   @override

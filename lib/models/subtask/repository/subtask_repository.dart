@@ -18,11 +18,15 @@ class SubtaskRepository extends ChangeNotifier {
   }
 
   save(SubTask subtask) async {
-    final newSubTask = SubTask(title: subtask.title);
-    final box = await getBox();
-    box.put(newSubTask);
-    subtasks.add(newSubTask);
-    notifyListeners();
+    try {
+      final box = await getBox();
+      box.put(subtask);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return false;
+    }
   }
 
   getAll() async {

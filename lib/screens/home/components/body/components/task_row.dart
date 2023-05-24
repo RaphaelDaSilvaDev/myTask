@@ -3,111 +3,192 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/models/task/task_model.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../constants/colors.dart';
 import '../../open_bottom_sheet.dart';
 
-class taskRowWidget extends StatelessWidget {
-  var isChecked = false;
+class taskRowWidget extends StatefulWidget {
   final Task task;
   final Function updatedChecked;
 
-  taskRowWidget({super.key, required this.task, required this.updatedChecked});
+  const taskRowWidget(
+      {super.key, required this.task, required this.updatedChecked});
+
+  @override
+  State<taskRowWidget> createState() => _taskRowWidgetState();
+}
+
+class _taskRowWidgetState extends State<taskRowWidget> {
+  var isChecked = false;
+  var isOpen = false;
+
   @override
   Widget build(BuildContext context) {
-    var isBeforeToday = Jiffy.parse(task.doAt != null
-            ? task.doAt!.toString()
+    var isBeforeToday = Jiffy.parse(widget.task.doAt != null
+            ? widget.task.doAt!.toString()
             : DateTime.now().toString())
         .isBefore(Jiffy.now()
             .startOf(Unit.day)
             .add(hours: 23, minutes: 59, seconds: 59));
 
-    var isAfterToday = task.doAt != null &&
-        Jiffy.parse(task.doAt.toString()).isBefore(Jiffy.now());
+    var isAfterToday = widget.task.doAt != null &&
+        Jiffy.parse(widget.task.doAt.toString()).isBefore(Jiffy.now());
 
     return Card(
       color: Colors.transparent,
       elevation: 0,
       child: ListTile(
-        onTap: task.isDone
-            ? null
-            : () {
-                openBottomSheet(
-                    context: context,
-                    task: task,
-                    updatedChecked: updatedChecked);
-              },
-        shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(24))),
-        tileColor: task.isDone ? gray10060 : gray100,
-        subtitle: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          child: SizedBox(
-            width: 300,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  task.title,
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w300,
-                      color: gray900),
-                ),
-                if (task.description != null && task.description!.isNotEmpty)
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 45,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Text(
-                        task.description!,
-                        style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w300,
-                            color: gray500),
+          onTap: widget.task.isDone
+              ? null
+              : () {
+                  openBottomSheet(
+                      context: context,
+                      task: widget.task,
+                      updatedChecked: widget.updatedChecked);
+                },
+          shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(24))),
+          tileColor: widget.task.isDone ? gray10060 : gray100,
+          subtitle: Padding(
+            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+            child: SizedBox(
+              width: 300,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.task.title,
+                    style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w300,
+                        color: gray900),
+                  ),
+                  if (widget.task.description != null &&
+                      widget.task.description!.isNotEmpty)
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: 25,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Text(
+                          widget.task.description!,
+                          style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w300,
+                              color: gray500),
+                        ),
                       ),
                     ),
+                  if (isOpen)
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      height: widget.task.subtasks.length * 40 <= 160
+                          ? widget.task.subtasks.length * 40
+                          : 160,
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: widget.task.subtasks.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Transform.scale(
+                                  scale: 1.4,
+                                  child: Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: BoxDecoration(
+                                        color: gray300,
+                                        borderRadius: BorderRadius.circular(6)),
+                                    child: Checkbox(
+                                      checkColor: gray100,
+                                      fillColor: widget
+                                              .task.subtasks[index].isDone
+                                          ? MaterialStateProperty.all(blue200)
+                                          : MaterialStateProperty.all(gray300),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(6)),
+                                      value: widget.task.subtasks[index].isDone,
+                                      onChanged: (bool? value) {
+                                        setState(() {
+                                          widget.task.subtasks[index].isDone =
+                                              value!;
+                                          widget.updatedChecked(widget.task);
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(widget.task.subtasks[index].title)
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  Text(
+                    widget.task.doAt != null
+                        ? isBeforeToday
+                            ? Jiffy.parse(widget.task.doAt.toString()).fromNow()
+                            : Jiffy.parse(widget.task.doAt.toString()).MMMMEEEEd
+                        : "Sem Data para Expirar",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        color: isAfterToday ? red300 : gray500),
+                  )
+                ],
+              ),
+            ),
+          ),
+          trailing: widget.task.subtasks.isEmpty
+              ? Transform.scale(
+                  scale: 1.4,
+                  child: Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                        color: gray300, borderRadius: BorderRadius.circular(6)),
+                    child: Checkbox(
+                      checkColor: gray100,
+                      fillColor: widget.task.isDone
+                          ? MaterialStateProperty.all(blue200)
+                          : MaterialStateProperty.all(gray300),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6)),
+                      value: widget.task.isDone,
+                      onChanged: (bool? value) {
+                        widget.task.isDone = value!;
+                        widget.task.finishedAt = DateTime.now();
+                        widget.updatedChecked(widget.task);
+                      },
+                    ),
                   ),
-                Text(
-                  task.doAt != null
-                      ? isBeforeToday
-                          ? Jiffy.parse(task.doAt.toString()).fromNow()
-                          : Jiffy.parse(task.doAt.toString()).MMMMEEEEd
-                      : "Sem Data para Expirar",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      color: isAfterToday ? red300 : gray500),
                 )
-              ],
-            ),
-          ),
-        ),
-        trailing: Transform.scale(
-          scale: 1.4,
-          child: Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-                color: gray300, borderRadius: BorderRadius.circular(6)),
-            child: Checkbox(
-              checkColor: gray100,
-              fillColor: task.isDone
-                  ? MaterialStateProperty.all(blue200)
-                  : MaterialStateProperty.all(gray300),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6)),
-              value: task.isDone,
-              onChanged: (bool? value) {
-                task.isDone = value!;
-                task.finishedAt = DateTime.now();
-                updatedChecked(task);
-              },
-            ),
-          ),
-        ),
-      ),
+              : isOpen
+                  ? InkWell(
+                      onTap: () {
+                        setState(() {
+                          isOpen = !isOpen;
+                        });
+                      },
+                      child: PhosphorIcon(PhosphorIcons.light.caretUp),
+                    )
+                  : InkWell(
+                      onTap: () {
+                        setState(() {
+                          isOpen = !isOpen;
+                        });
+                      },
+                      child: PhosphorIcon(PhosphorIcons.light.caretDown),
+                    )),
     );
   }
 }
