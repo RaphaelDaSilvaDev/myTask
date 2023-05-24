@@ -1,7 +1,6 @@
-// ignore_for_file: no_logic_in_create_state
+// ignore_for_file: no_logic_in_create_state, use_build_context_synchronously
 import 'package:flutter/material.dart';
 import 'package:my_tasks/constants/colors.dart';
-import 'package:my_tasks/models/subtask/repository/subtask_repository.dart';
 import 'package:my_tasks/models/subtask/subtask_model.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
 import 'package:provider/provider.dart';
@@ -30,18 +29,14 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _controller.jumpTo(_controller.position.maxScrollExtent);
+      if (task.subtasks.length > 1) {
+        _controller.jumpTo(_controller.position.maxScrollExtent);
+      }
     });
   }
 
   save() async {
-    task.subtasks
-        .map((element) => context.read<SubtaskRepository>().save(element));
-    if (editTask == false) {
-      context.read<TaskRepository>().save(task);
-    } else {
-      context.read<TaskRepository>().update(task);
-    }
+    await context.read<TaskRepository>().save(task);
 
     Navigator.of(context).pop();
   }
@@ -49,7 +44,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   addSubtask(SubTask subtask) {
     setState(() {
       task.subtasks.add(subtask);
-      _controller.jumpTo(_controller.position.maxScrollExtent);
+      if (task.subtasks.length > 1) {
+        _controller.jumpTo(_controller.position.maxScrollExtent);
+      }
     });
   }
 
@@ -153,7 +150,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                                       shrinkWrap: true,
                                       children: [
                                         for (var subtask in task.subtasks)
-                                          SubtaskRow(subtask: subtask)
+                                          SubtaskRow(
+                                            subtask: subtask,
+                                          )
                                       ],
                                     ),
                                   ),

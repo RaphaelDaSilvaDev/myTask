@@ -20,18 +20,15 @@ class TaskRepository extends ChangeNotifier {
   }
 
   save(Task task) async {
-    final newTask =
-        Task(title: task.title, description: task.description, doAt: task.doAt);
-    final box = await getBox();
-    box.put(newTask);
-    tasks.add(newTask);
-    notifyListeners();
-  }
-
-  update(Task task) async {
-    final box = await getBox();
-    box.put(task);
-    notifyListeners();
+    try {
+      final box = await getBox();
+      box.put(task);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return false;
+    }
   }
 
   getAll() async {
