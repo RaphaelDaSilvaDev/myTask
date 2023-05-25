@@ -129,15 +129,15 @@ class _DoAtButtonState extends State<DoAtButton> {
             color: gray900,
           ),
           Text(
-            widget.task.doAt != null
-                ? Jiffy.parse(task.doAt != null
-                            ? task.doAt!.toString()
+            widget.task.finishedAt != null
+                ? Jiffy.parse(task.finishedAt != null
+                            ? task.finishedAt!.toString()
                             : DateTime.now().toString())
                         .isBefore(Jiffy.now()
                             .startOf(Unit.day)
                             .add(hours: 23, minutes: 59, seconds: 59))
-                    ? Jiffy.parse(widget.task.doAt.toString()).fromNow()
-                    : Jiffy.parse(widget.task.doAt.toString()).MMMMEEEEd
+                    ? Jiffy.parse(widget.task.finishedAt.toString()).fromNow()
+                    : Jiffy.parse(widget.task.finishedAt.toString()).MMMMEEEEd
                 : "Expiração",
             style: const TextStyle(color: gray900, fontSize: 16),
           ),

@@ -26,15 +26,15 @@ class _taskRowWidgetState extends State<taskRowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var isBeforeToday = Jiffy.parse(widget.task.doAt != null
-            ? widget.task.doAt!.toString()
+    var isBeforeToday = Jiffy.parse(widget.task.finishedAt != null
+            ? widget.task.finishedAt!.toString()
             : DateTime.now().toString())
         .isBefore(Jiffy.now()
             .startOf(Unit.day)
             .add(hours: 23, minutes: 59, seconds: 59));
 
-    var isAfterToday = widget.task.doAt != null &&
-        Jiffy.parse(widget.task.doAt.toString()).isBefore(Jiffy.now());
+    var isAfterToday = widget.task.finishedAt != null &&
+        Jiffy.parse(widget.task.finishedAt.toString()).isBefore(Jiffy.now());
 
     return Card(
       color: Colors.transparent,
@@ -143,10 +143,12 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                   ),
                 ),
                 Text(
-                  widget.task.doAt != null
+                  widget.task.finishedAt != null
                       ? isBeforeToday
-                          ? Jiffy.parse(widget.task.doAt.toString()).fromNow()
-                          : Jiffy.parse(widget.task.doAt.toString()).MMMMEEEEd
+                          ? Jiffy.parse(widget.task.finishedAt.toString())
+                              .fromNow()
+                          : Jiffy.parse(widget.task.finishedAt.toString())
+                              .MMMMEEEEd
                       : "Sem Data para Expirar",
                   style: TextStyle(
                       fontSize: 14,
@@ -176,9 +178,9 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                     onChanged: (bool? value) {
                       widget.task.isDone = value!;
                       if (value == true) {
-                        widget.task.finishedAt = DateTime.now();
+                        widget.task.doAt = DateTime.now();
                       } else {
-                        widget.task.finishedAt = null;
+                        widget.task.doAt = null;
                       }
                       widget.updatedChecked(widget.task);
                     },
