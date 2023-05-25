@@ -29,6 +29,18 @@ class SubtaskRepository extends ChangeNotifier {
     }
   }
 
+  remove(SubTask subtask) async {
+    try {
+      final box = await getBox();
+      box.removeAsync(subtask.id);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return false;
+    }
+  }
+
   getAll() async {
     final box = await getBox();
     _subtaskList = box.getAll() as List<SubTask>;

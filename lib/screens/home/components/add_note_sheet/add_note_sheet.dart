@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:my_tasks/constants/colors.dart';
 import 'package:my_tasks/models/subtask/subtask_model.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
+import 'package:my_tasks/screens/home/components/add_note_sheet/components/add_subtask_row.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../models/subtask/repository/subtask_repository.dart';
 import '../../../../models/task/task_model.dart';
 import 'components/do_at_buttons.dart';
 import 'components/subtask_row.dart';
@@ -36,6 +38,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   }
 
   save() async {
+    for (var subtask in task.subtasks) {
+      await context.read<SubtaskRepository>().save(subtask);
+    }
     await context.read<TaskRepository>().save(task);
 
     Navigator.of(context).pop();
@@ -47,6 +52,20 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
       if (task.subtasks.length > 1) {
         _controller.jumpTo(_controller.position.maxScrollExtent);
       }
+    });
+  }
+
+  updateSubtask(SubTask subTask) {
+    var index = task.subtasks.indexOf(subTask);
+    setState(() {
+      task.subtasks.replaceRange(index, 1, [subTask]);
+    });
+  }
+
+  removeSubtask(SubTask subtask) async {
+    setState(() {
+      task.subtasks
+          .removeWhere((element) => element.hashCode == subtask.hashCode);
     });
   }
 
@@ -143,7 +162,9 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                                   SizedBox(
                                     width:
                                         MediaQuery.of(context).size.width - 60,
-                                    height: 90,
+                                    height: task.subtasks.length * 30 <= 95
+                                        ? task.subtasks.length * 30
+                                        : 95,
                                     child: ListView(
                                       controller: _controller,
                                       padding: EdgeInsets.zero,
@@ -152,11 +173,13 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                                         for (var subtask in task.subtasks)
                                           SubtaskRow(
                                             subtask: subtask,
+                                            updateSubtask: updateSubtask,
+                                            removeSubtask: removeSubtask,
                                           )
                                       ],
                                     ),
                                   ),
-                                SubtaskRow(
+                                AddSubtaskRow(
                                   addSubtask: addSubtask,
                                 ),
                                 if (editTask == true)
