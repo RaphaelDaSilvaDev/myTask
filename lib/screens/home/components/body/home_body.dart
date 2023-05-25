@@ -37,15 +37,14 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
       for (var subtask in task.subtasks) {
         await context.read<SubtaskRepository>().save(subtask);
       }
-    }
-
-    if (task.subtasks.where((element) => element.isDone == true).length ==
-        task.subtasks.length) {
-      task.isDone = true;
-      task.finishedAt = DateTime.now();
-    } else {
-      task.isDone = false;
-      task.finishedAt = null;
+      if (task.subtasks.where((element) => element.isDone == true).length ==
+          task.subtasks.length) {
+        task.isDone = true;
+        task.finishedAt = DateTime.now();
+      } else {
+        task.isDone = false;
+        task.finishedAt = null;
+      }
     }
 
     await context.read<TaskRepository>().save(task);

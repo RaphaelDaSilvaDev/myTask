@@ -22,6 +22,7 @@ class taskRowWidget extends StatefulWidget {
 class _taskRowWidgetState extends State<taskRowWidget> {
   var isChecked = false;
   var isOpen = false;
+  var turns = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -39,156 +40,170 @@ class _taskRowWidgetState extends State<taskRowWidget> {
       color: Colors.transparent,
       elevation: 0,
       child: ListTile(
-          onTap: widget.task.isDone
-              ? null
-              : () {
-                  openBottomSheet(
-                      context: context,
-                      task: widget.task,
-                      updatedChecked: widget.updatedChecked);
-                },
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(24))),
-          tileColor: widget.task.isDone ? gray10060 : gray100,
-          subtitle: Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-            child: SizedBox(
-              width: 300,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    widget.task.title,
-                    style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w300,
-                        color: gray900),
-                  ),
-                  if (widget.task.description != null &&
-                      widget.task.description!.isNotEmpty)
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: 25,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Text(
-                          widget.task.description!,
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w300,
-                              color: gray500),
-                        ),
+        onTap: widget.task.isDone
+            ? null
+            : () {
+                openBottomSheet(
+                    context: context,
+                    task: widget.task,
+                    updatedChecked: widget.updatedChecked);
+              },
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(24))),
+        tileColor: widget.task.isDone ? gray10060 : gray100,
+        subtitle: Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: SizedBox(
+            width: 300,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.task.title,
+                  style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w300,
+                      color: gray900),
+                ),
+                if (widget.task.description != null &&
+                    widget.task.description!.isNotEmpty)
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: 25,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.vertical,
+                      child: Text(
+                        widget.task.description!,
+                        style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w300,
+                            color: gray500),
                       ),
                     ),
-                  if (isOpen)
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: widget.task.subtasks.length * 40 <= 160
+                  ),
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  height: isOpen
+                      ? widget.task.subtasks.length * 40 <= 160
                           ? widget.task.subtasks.length * 40
-                          : 160,
-                      child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        itemCount: widget.task.subtasks.length,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                Transform.scale(
-                                  scale: 1.4,
-                                  child: Container(
-                                    width: 18,
-                                    height: 18,
-                                    decoration: BoxDecoration(
-                                        color: gray300,
+                          : 160
+                      : 0,
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: isOpen
+                        ? widget.task.subtasks.length * 40 <= 160
+                            ? widget.task.subtasks.length * 40
+                            : 160
+                        : 0,
+                    child: ListView.builder(
+                      padding: EdgeInsets.zero,
+                      shrinkWrap: true,
+                      itemCount: widget.task.subtasks.length,
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Transform.scale(
+                                scale: 1.4,
+                                child: Container(
+                                  width: 18,
+                                  height: 18,
+                                  decoration: BoxDecoration(
+                                      color: gray300,
+                                      borderRadius: BorderRadius.circular(6)),
+                                  child: Checkbox(
+                                    checkColor: gray100,
+                                    fillColor: widget
+                                            .task.subtasks[index].isDone
+                                        ? MaterialStateProperty.all(blue200)
+                                        : MaterialStateProperty.all(gray300),
+                                    shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(6)),
-                                    child: Checkbox(
-                                      checkColor: gray100,
-                                      fillColor: widget
-                                              .task.subtasks[index].isDone
-                                          ? MaterialStateProperty.all(blue200)
-                                          : MaterialStateProperty.all(gray300),
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(6)),
-                                      value: widget.task.subtasks[index].isDone,
-                                      onChanged: (bool? value) {
-                                        setState(() {
-                                          widget.task.subtasks[index].isDone =
-                                              value!;
-                                          widget.updatedChecked(widget.task);
-                                        });
-                                      },
-                                    ),
+                                    value: widget.task.subtasks[index].isDone,
+                                    onChanged: (bool? value) {
+                                      setState(() {
+                                        widget.task.subtasks[index].isDone =
+                                            value!;
+                                        widget.updatedChecked(widget.task);
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Text(widget.task.subtasks[index].title)
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  Text(
-                    widget.task.doAt != null
-                        ? isBeforeToday
-                            ? Jiffy.parse(widget.task.doAt.toString()).fromNow()
-                            : Jiffy.parse(widget.task.doAt.toString()).MMMMEEEEd
-                        : "Sem Data para Expirar",
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w300,
-                        color: isAfterToday ? red300 : gray500),
-                  )
-                ],
-              ),
-            ),
-          ),
-          trailing: widget.task.subtasks.isEmpty
-              ? Transform.scale(
-                  scale: 1.4,
-                  child: Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                        color: gray300, borderRadius: BorderRadius.circular(6)),
-                    child: Checkbox(
-                      checkColor: gray100,
-                      fillColor: widget.task.isDone
-                          ? MaterialStateProperty.all(blue200)
-                          : MaterialStateProperty.all(gray300),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(6)),
-                      value: widget.task.isDone,
-                      onChanged: (bool? value) {
-                        widget.task.isDone = value!;
-                        widget.task.finishedAt = DateTime.now();
-                        widget.updatedChecked(widget.task);
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text(widget.task.subtasks[index].title)
+                            ],
+                          ),
+                        );
                       },
                     ),
                   ),
+                ),
+                Text(
+                  widget.task.doAt != null
+                      ? isBeforeToday
+                          ? Jiffy.parse(widget.task.doAt.toString()).fromNow()
+                          : Jiffy.parse(widget.task.doAt.toString()).MMMMEEEEd
+                      : "Sem Data para Expirar",
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w300,
+                      color: isAfterToday ? red300 : gray500),
                 )
-              : isOpen
-                  ? InkWell(
-                      onTap: () {
-                        setState(() {
-                          isOpen = !isOpen;
-                        });
-                      },
-                      child: PhosphorIcon(PhosphorIcons.light.caretUp),
-                    )
-                  : InkWell(
-                      onTap: () {
-                        setState(() {
-                          isOpen = !isOpen;
-                        });
-                      },
-                      child: PhosphorIcon(PhosphorIcons.light.caretDown),
-                    )),
+              ],
+            ),
+          ),
+        ),
+        trailing: widget.task.subtasks.isEmpty
+            ? Transform.scale(
+                scale: 1.4,
+                child: Container(
+                  width: 18,
+                  height: 18,
+                  decoration: BoxDecoration(
+                      color: gray300, borderRadius: BorderRadius.circular(6)),
+                  child: Checkbox(
+                    checkColor: gray100,
+                    fillColor: widget.task.isDone
+                        ? MaterialStateProperty.all(blue200)
+                        : MaterialStateProperty.all(gray300),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6)),
+                    value: widget.task.isDone,
+                    onChanged: (bool? value) {
+                      widget.task.isDone = value!;
+                      if (value == true) {
+                        widget.task.finishedAt = DateTime.now();
+                      } else {
+                        widget.task.finishedAt = null;
+                      }
+                      widget.updatedChecked(widget.task);
+                    },
+                  ),
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.fromLTRB(0, 2, 0, 10),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        isOpen = !isOpen;
+                        isOpen ? turns -= 1 / 2 : turns += 1 / 2;
+                      });
+                    },
+                    child: AnimatedRotation(
+                        turns: turns,
+                        duration: const Duration(milliseconds: 200),
+                        child: PhosphorIcon(PhosphorIcons.light.caretDown)),
+                  ),
+                ),
+              ),
+      ),
     );
   }
 }
