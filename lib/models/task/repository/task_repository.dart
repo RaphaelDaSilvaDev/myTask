@@ -33,7 +33,10 @@ class TaskRepository extends ChangeNotifier {
 
   getAll() async {
     final box = await getBox();
-    _taskList = box.getAll() as List<Task>;
+    //_taskList = box.getAll().sort() as List<Task>;
+    final query = box.query().order(Task_.finishedAt).build();
+    _taskList = query.find() as List<Task>;
+    query.close();
     notifyListeners();
   }
 }

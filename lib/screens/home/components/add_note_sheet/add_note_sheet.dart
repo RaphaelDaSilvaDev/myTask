@@ -71,7 +71,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
 
   changeTime(DateTime dateTime) {
     setState(() {
-      task.doAt = dateTime;
+      task.finishedAt = dateTime;
     });
   }
 
