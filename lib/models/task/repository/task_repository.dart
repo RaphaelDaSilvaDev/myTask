@@ -23,6 +23,21 @@ class TaskRepository extends ChangeNotifier {
     try {
       final box = await getBox();
       box.put(task);
+      tasks.add(task);
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return false;
+    }
+  }
+
+  update(Task task) async {
+    try {
+      final box = await getBox();
+      box.put(task);
+      var index = tasks.indexOf(task);
+      tasks[index] = task;
       notifyListeners();
       return true;
     } catch (e) {
@@ -32,11 +47,16 @@ class TaskRepository extends ChangeNotifier {
   }
 
   getAll() async {
-    final box = await getBox();
-    //_taskList = box.getAll().sort() as List<Task>;
-    final query = box.query().order(Task_.finishedAt).build();
-    _taskList = query.find() as List<Task>;
-    query.close();
-    notifyListeners();
+    try {
+      final box = await getBox();
+      final query = box.query().order(Task_.finishedAt).build();
+      _taskList = query.find() as List<Task>;
+      query.close();
+      notifyListeners();
+      return true;
+    } catch (e) {
+      debugPrint("Error - $e");
+      return false;
+    }
   }
 }

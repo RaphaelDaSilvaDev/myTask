@@ -4,6 +4,7 @@ import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:day_night_time_picker/lib/state/time.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:my_tasks/utils/date_format.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../constants/colors.dart';
@@ -104,9 +105,16 @@ class _DoAtButtonState extends State<DoAtButton> {
       style: ButtonStyle(
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(
-            // Change your radius here
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
           ),
+        ),
+        elevation: MaterialStateProperty.resolveWith<double>(
+          (Set<MaterialState> states) {
+            if (states.contains(MaterialState.disabled)) {
+              return 0;
+            }
+            return 0;
+          },
         ),
         backgroundColor: MaterialStateProperty.all<Color>(gray100),
         overlayColor: MaterialStateProperty.resolveWith<Color?>(
@@ -130,14 +138,7 @@ class _DoAtButtonState extends State<DoAtButton> {
           ),
           Text(
             widget.task.finishedAt != null
-                ? Jiffy.parse(task.finishedAt != null
-                            ? task.finishedAt!.toString()
-                            : DateTime.now().toString())
-                        .isBefore(Jiffy.now()
-                            .startOf(Unit.day)
-                            .add(hours: 23, minutes: 59, seconds: 59))
-                    ? Jiffy.parse(widget.task.finishedAt.toString()).fromNow()
-                    : Jiffy.parse(widget.task.finishedAt.toString()).MMMMEEEEd
+                ? dateFormatBefore2Days(dateToShow: widget.task.finishedAt)
                 : "Expiração",
             style: const TextStyle(color: gray900, fontSize: 16),
           ),

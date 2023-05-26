@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/models/task/task_model.dart';
+import 'package:my_tasks/utils/date_format.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 import '../../../../../constants/colors.dart';
@@ -26,13 +27,6 @@ class _taskRowWidgetState extends State<taskRowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var isBeforeToday = Jiffy.parse(widget.task.finishedAt != null
-            ? widget.task.finishedAt!.toString()
-            : DateTime.now().toString())
-        .isBefore(Jiffy.now()
-            .startOf(Unit.day)
-            .add(hours: 23, minutes: 59, seconds: 59));
-
     var isAfterToday = widget.task.finishedAt != null &&
         Jiffy.parse(widget.task.finishedAt.toString()).isBefore(Jiffy.now());
 
@@ -142,19 +136,19 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                     ),
                   ),
                 ),
-                Text(
-                  widget.task.finishedAt != null
-                      ? isBeforeToday
-                          ? Jiffy.parse(widget.task.finishedAt.toString())
-                              .fromNow()
-                          : Jiffy.parse(widget.task.finishedAt.toString())
-                              .MMMMEEEEd
-                      : "Sem Data para Expirar",
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w300,
-                      color: isAfterToday ? red300 : gray500),
-                )
+                if (widget.task.finishedAt != null &&
+                    Jiffy.now().isAfter(
+                        Jiffy.parse(widget.task.finishedAt.toString())))
+                  Text(
+                    widget.task.finishedAt != null
+                        ? dateFormatReturnHours(
+                            dateToShow: widget.task.finishedAt)
+                        : "Sem Data para Expirar",
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w300,
+                        color: isAfterToday ? red300 : gray500),
+                  )
               ],
             ),
           ),

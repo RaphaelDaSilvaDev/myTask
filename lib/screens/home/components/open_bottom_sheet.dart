@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import '../../../models/task/repository/task_repository.dart';
 import '../../../models/task/task_model.dart';
 import 'add_note_sheet/add_note_sheet.dart';
 
@@ -18,7 +15,5 @@ openBottomSheet(
             child: AddNoteSheet(
               task: task,
             ),
-          )).whenComplete(() async {
-    await context.read<TaskRepository>().getAll();
-  });
+          ));
 }
