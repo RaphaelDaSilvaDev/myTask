@@ -1,6 +1,5 @@
 // ignore_for_file: no_logic_in_create_state, use_build_context_synchronously
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/utils/date_format.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -116,10 +115,7 @@ class _ExpirationButtomState extends State<ExpirationButtom> {
             color: gray900,
           ),
           Text(
-            widget.task.finishedAt != null
-                ? dateFormatToTodayAndTomorrow(
-                    dateToShow: widget.task.finishedAt)
-                : "Expiração",
+            dateFormatToTodayAndTomorrow(dateToShow: widget.task.expiresOn),
             style: const TextStyle(color: gray900, fontSize: 16),
           ),
         ],

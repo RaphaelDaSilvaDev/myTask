@@ -1,5 +1,6 @@
 // ignore_for_file: no_logic_in_create_state, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/constants/colors.dart';
 import 'package:my_tasks/models/subtask/subtask_model.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
@@ -84,7 +85,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
 
   changeTime(DateTime dateTime) {
     setState(() {
-      task.finishedAt = dateTime;
+      task.expiresOn = dateTime;
     });
   }
 
@@ -197,7 +198,8 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                                 ),
                                 if (editTask == true)
                                   Text(
-                                    task.createdAtFormated.toString(),
+                                    Jiffy.parse(task.createdAt.toString())
+                                        .MMMMEEEEd,
                                     style: const TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w300,

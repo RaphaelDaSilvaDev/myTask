@@ -3,7 +3,6 @@
 import 'package:day_night_time_picker/lib/daynight_timepicker.dart';
 import 'package:day_night_time_picker/lib/state/time.dart';
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/utils/date_format.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -57,8 +56,8 @@ class _DoAtButtonState extends State<DoAtButton> {
             selected.year,
             selected.month,
             selected.day,
-            widget.task.doAt?.hour ?? selectedTime.hour,
-            widget.task.doAt?.minute ?? selectedTime.minute);
+            widget.task.doneAt?.hour ?? selectedTime.hour,
+            widget.task.doneAt?.minute ?? selectedTime.minute);
       });
       await _selectTime(context);
     } else {
@@ -137,9 +136,7 @@ class _DoAtButtonState extends State<DoAtButton> {
             color: gray900,
           ),
           Text(
-            widget.task.finishedAt != null
-                ? dateFormatBefore2Days(dateToShow: widget.task.finishedAt)
-                : "Expiração",
+            dateFormatBefore2Days(dateToShow: widget.task.expiresOn),
             style: const TextStyle(color: gray900, fontSize: 16),
           ),
         ],

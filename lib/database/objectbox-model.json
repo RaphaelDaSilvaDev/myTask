@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:5327643524230729498",
-      "lastPropertyId": "8:8911073921537597230",
+      "lastPropertyId": "14:7705765985724675241",
       "name": "Task",
       "properties": [
         {
@@ -40,13 +40,36 @@
           "type": 10
         },
         {
-          "id": "7:4383474965537481400",
-          "name": "finishedAt",
+          "id": "9:9070333767316089910",
+          "name": "priority",
+          "type": 9
+        },
+        {
+          "id": "10:4990881563369069185",
+          "name": "difficulty",
+          "type": 9
+        },
+        {
+          "id": "11:1790966468787311204",
+          "name": "workspaceId",
+          "type": 11,
+          "flags": 520,
+          "indexId": "1:2587172962836843971",
+          "relationTarget": "Workspace"
+        },
+        {
+          "id": "12:5798228577801578763",
+          "name": "expiresOn",
           "type": 10
         },
         {
-          "id": "8:8911073921537597230",
-          "name": "doAt",
+          "id": "13:8838126941663344968",
+          "name": "alertOn",
+          "type": 10
+        },
+        {
+          "id": "14:7705765985724675241",
+          "name": "doneAt",
           "type": 10
         }
       ],
@@ -81,17 +104,49 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "3:8562431557979747181",
+      "lastPropertyId": "4:2356016033753520730",
+      "name": "Workspace",
+      "properties": [
+        {
+          "id": "1:1915226291473572530",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "2:6096813802699462108",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "3:1931358668448530435",
+          "name": "isDefault",
+          "type": 1
+        },
+        {
+          "id": "4:2356016033753520730",
+          "name": "createdAt",
+          "type": 10
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "2:974781339298099500",
-  "lastIndexId": "0:0",
+  "lastEntityId": "3:8562431557979747181",
+  "lastIndexId": "1:2587172962836843971",
   "lastRelationId": "1:5506896385409575212",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    4383474965537481400,
+    8911073921537597230
+  ],
   "retiredRelationUids": [],
   "version": 1
 }
