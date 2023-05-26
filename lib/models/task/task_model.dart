@@ -1,7 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
-
-import 'package:intl/intl.dart';
 import 'package:my_tasks/models/subtask/subtask_model.dart';
+import 'package:my_tasks/models/workspace/workspace_model.dart';
 import 'package:objectbox/objectbox.dart';
 
 @Entity()
@@ -11,22 +10,29 @@ class Task {
   String? description;
   bool isDone;
   bool isArchived;
+  String? priority;
+  String? difficulty;
   final subtasks = ToMany<SubTask>();
+  final workspace = ToOne<Workspace>();
   DateTime createdAt;
-  DateTime? finishedAt;
-  DateTime? doAt;
+  DateTime expiresOn;
+  DateTime? alertOn;
+  DateTime? doneAt;
 
-  Task(
-      {this.id = 0,
-      required this.title,
-      this.description,
-      this.isDone = false,
-      this.isArchived = false,
-      this.finishedAt,
-      this.doAt,
-      ToMany<SubTask>? subtasks,
-      DateTime? createdAt})
-      : createdAt = createdAt ?? DateTime.now();
-
-  String get createdAtFormated => DateFormat.jm().format(createdAt);
+  Task({
+    this.id = 0,
+    required this.title,
+    this.description,
+    this.isDone = false,
+    this.isArchived = false,
+    this.priority,
+    this.difficulty,
+    this.alertOn,
+    this.doneAt,
+    ToOne<Workspace>? workspace,
+    ToMany<SubTask>? subtasks,
+    DateTime? createdAt,
+    DateTime? expiresOn,
+  })  : expiresOn = expiresOn ?? DateTime.now(),
+        createdAt = createdAt ?? DateTime.now();
 }

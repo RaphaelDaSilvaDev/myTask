@@ -42,10 +42,10 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
       if (task.subtasks.where((element) => element.isDone == true).length ==
           task.subtasks.length) {
         task.isDone = true;
-        task.doAt = DateTime.now();
+        task.doneAt = DateTime.now();
       } else {
         task.isDone = false;
-        task.doAt = null;
+        task.doneAt = null;
       }
     }
 
@@ -88,44 +88,25 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
               }
 
               final isLateTask = tasks
-                  .where((element) =>
-                      element.finishedAt != null &&
-                      Jiffy.parse(element.finishedAt.toString())
+                  .where((element) => Jiffy.parse(element.expiresOn.toString())
                           .isBefore(Jiffy.parseFromList([
                         DateTime.now().year,
                         DateTime.now().month,
                         DateTime.now().day,
-                        DateTime.now().hour,
-                        DateTime.now().minute,
-                        DateTime.now().second,
                       ])))
                   .toList();
 
               final isTodayTask = tasks
-                  .where((element) =>
-                      element.finishedAt == null ||
-                      element.finishedAt != null &&
-                          Jiffy.parse(element.finishedAt.toString())
-                              .isAfter(Jiffy.parseFromList([
-                            DateTime.now().year,
-                            DateTime.now().month,
-                            DateTime.now().day,
-                            DateTime.now().hour,
-                            DateTime.now().minute,
-                            DateTime.now().second,
-                          ])) &&
-                          Jiffy.parse(element.finishedAt.toString())
-                              .isBefore(Jiffy.parseFromList([
-                            DateTime.now().year,
-                            DateTime.now().month,
-                            DateTime.now().day + 1,
-                          ])))
+                  .where((element) => Jiffy.parse(element.expiresOn.toString())
+                          .isSame(Jiffy.parseFromList([
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day,
+                      ])))
                   .toList();
 
-              final firstWithDate = repository.tasks
-                  .where((element) => element.finishedAt != null);
-              final lastDay =
-                  Jiffy.parse(firstWithDate.last.finishedAt.toString());
+              final lastDay = Jiffy.parse(tasks.last.expiresOn.toString())
+                  .startOf(Unit.day);
 
               final totalDays = lastDay.diff(
                   Jiffy.parseFromList([
@@ -253,16 +234,15 @@ class OthersDays extends StatelessWidget {
           ),
         ),
         for (var task in tasks)
-          if (task.finishedAt != null &&
-              Jiffy.parseFromList([
-                task.finishedAt!.year,
-                task.finishedAt!.month,
-                task.finishedAt!.day
-              ]).isSame(Jiffy.parseFromList([
-                DateTime.now().year,
-                DateTime.now().month,
-                DateTime.now().day
-              ]).add(days: day)))
+          if (Jiffy.parseFromList([
+            task.expiresOn.year,
+            task.expiresOn.month,
+            task.expiresOn.day
+          ]).isSame(Jiffy.parseFromList([
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day
+          ]).add(days: day)))
             taskRowWidget(task: task, updatedChecked: updatedChecked)
       ],
     );

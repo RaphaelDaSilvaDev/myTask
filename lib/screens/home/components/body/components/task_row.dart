@@ -27,8 +27,8 @@ class _taskRowWidgetState extends State<taskRowWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var isAfterToday = widget.task.finishedAt != null &&
-        Jiffy.parse(widget.task.finishedAt.toString()).isBefore(Jiffy.now());
+    var isAfterToday =
+        Jiffy.parse(widget.task.expiresOn.toString()).isBefore(Jiffy.now());
 
     return Card(
       color: Colors.transparent,
@@ -136,14 +136,11 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                     ),
                   ),
                 ),
-                if (widget.task.finishedAt != null &&
-                    Jiffy.now().isAfter(
-                        Jiffy.parse(widget.task.finishedAt.toString())))
+                if (Jiffy.now().startOf(Unit.day).isAfter(
+                    Jiffy.parse(widget.task.expiresOn.toString())
+                        .startOf(Unit.day)))
                   Text(
-                    widget.task.finishedAt != null
-                        ? dateFormatReturnHours(
-                            dateToShow: widget.task.finishedAt)
-                        : "Sem Data para Expirar",
+                    dateFormatReturnHours(dateToShow: widget.task.expiresOn),
                     style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w300,
@@ -172,9 +169,9 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                     onChanged: (bool? value) {
                       widget.task.isDone = value!;
                       if (value == true) {
-                        widget.task.doAt = DateTime.now();
+                        widget.task.doneAt = DateTime.now();
                       } else {
-                        widget.task.doAt = null;
+                        widget.task.doneAt = null;
                       }
                       widget.updatedChecked(widget.task);
                     },

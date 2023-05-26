@@ -24,6 +24,7 @@ class TaskRepository extends ChangeNotifier {
       final box = await getBox();
       box.put(task);
       tasks.add(task);
+      tasks.sort((a, b) => a.expiresOn.compareTo(b.expiresOn));
       notifyListeners();
       return true;
     } catch (e) {
@@ -49,7 +50,7 @@ class TaskRepository extends ChangeNotifier {
   getAll() async {
     try {
       final box = await getBox();
-      final query = box.query().order(Task_.finishedAt).build();
+      final query = box.query().order(Task_.expiresOn).build();
       _taskList = query.find() as List<Task>;
       query.close();
       notifyListeners();
