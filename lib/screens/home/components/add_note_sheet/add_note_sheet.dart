@@ -8,24 +8,28 @@ import 'package:provider/provider.dart';
 
 import '../../../../models/subtask/repository/subtask_repository.dart';
 import '../../../../models/task/task_model.dart';
-import 'components/do_at_buttons.dart';
+import 'components/expiration_buttom.dart';
 import 'components/subtask_row.dart';
 
 class AddNoteSheet extends StatefulWidget {
-  const AddNoteSheet({super.key, this.task});
+  const AddNoteSheet({super.key, this.task, this.update});
 
   final Task? task;
+  final Function? update;
 
   @override
   State<AddNoteSheet> createState() => _AddNoteSheetState(
-      editTask: task != null ? true : false, task: task ?? Task(title: ""));
+      editTask: task != null ? true : false,
+      task: task ?? Task(title: ""),
+      updateFunc: update);
 }
 
 class _AddNoteSheetState extends State<AddNoteSheet> {
   bool? editTask = false;
   Task task;
+  final Function? updateFunc;
   final ScrollController _controller = ScrollController();
-  _AddNoteSheetState({this.editTask, required this.task});
+  _AddNoteSheetState({this.editTask, this.updateFunc, required this.task});
 
   @override
   void initState() {
@@ -42,6 +46,15 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
       await context.read<SubtaskRepository>().save(subtask);
     }
     await context.read<TaskRepository>().save(task);
+
+    Navigator.of(context).pop();
+  }
+
+  update() async {
+    for (var subtask in task.subtasks) {
+      await context.read<SubtaskRepository>().save(subtask);
+    }
+    await context.read<TaskRepository>().update(task);
 
     Navigator.of(context).pop();
   }
@@ -208,7 +221,7 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                     shrinkWrap: true,
                     scrollDirection: Axis.horizontal,
                     children: [
-                      DoAtButton(
+                      ExpirationButtom(
                         task: task,
                         changeTime: changeTime,
                       )
@@ -219,26 +232,30 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
             ),
             Align(
               alignment: Alignment.bottomRight,
-              child: FloatingActionButton(
-                onPressed: task.title.isNotEmpty
-                    ? () {
-                        save();
-                      }
-                    : null,
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(18)),
-                      gradient: LinearGradient(
-                          colors: task.title.isNotEmpty
-                              ? [blue200, blue400]
-                              : [gray300, gray500],
-                          begin: Alignment.topLeft,
-                          end: AlignmentDirectional.bottomEnd)),
-                  child: const Icon(
-                    Icons.add,
-                    size: 40,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
+                child: FloatingActionButton(
+                  onPressed: task.title.isNotEmpty
+                      ? () {
+                          editTask! ? update() : save();
+                        }
+                      : null,
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(18)),
+                        gradient: LinearGradient(
+                            colors: task.title.isNotEmpty
+                                ? [blue200, blue400]
+                                : [gray300, gray500],
+                            begin: Alignment.topLeft,
+                            end: AlignmentDirectional.bottomEnd)),
+                    child: const Icon(
+                      Icons.add,
+                      size: 40,
+                    ),
                   ),
                 ),
               ),

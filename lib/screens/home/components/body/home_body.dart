@@ -5,6 +5,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:my_tasks/models/subtask/repository/subtask_repository.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
 import 'package:my_tasks/screens/home/components/body/components/task_row.dart';
+import 'package:my_tasks/utils/date_format.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../constants/colors.dart';
@@ -41,14 +42,14 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
       if (task.subtasks.where((element) => element.isDone == true).length ==
           task.subtasks.length) {
         task.isDone = true;
-        task.finishedAt = DateTime.now();
+        task.doAt = DateTime.now();
       } else {
         task.isDone = false;
-        task.finishedAt = null;
+        task.doAt = null;
       }
     }
 
-    await context.read<TaskRepository>().save(task);
+    await context.read<TaskRepository>().update(task);
   }
 
   @override
@@ -61,44 +62,6 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
           builder: (context, load, _) => Consumer<TaskRepository>(
             builder: (context, repository, child) {
               final tasks = repository.tasks;
-
-              final isLateTask = tasks.where((element) =>
-                  element.finishedAt != null &&
-                  Jiffy.parseFromList([
-                    element.finishedAt!.year,
-                    element.finishedAt!.month,
-                    element.finishedAt!.day
-                  ]).isBefore(Jiffy.parseFromList([
-                    DateTime.now().year,
-                    DateTime.now().month,
-                    DateTime.now().day
-                  ])));
-
-              final isTodayTask = tasks.where((element) =>
-                  element.finishedAt != null &&
-                  Jiffy.parseFromList([
-                    element.finishedAt!.year,
-                    element.finishedAt!.month,
-                    element.finishedAt!.day
-                  ]).isSame(Jiffy.parseFromList([
-                    DateTime.now().year,
-                    DateTime.now().month,
-                    DateTime.now().day
-                  ])));
-
-              final firstWithDate = repository.tasks
-                  .where((element) => element.finishedAt != null);
-              final lastDay =
-                  Jiffy.parse(firstWithDate.last.finishedAt.toString());
-
-              final totalDays = lastDay.diff(
-                  Jiffy.parseFromList([
-                    DateTime.now().year,
-                    DateTime.now().month,
-                    DateTime.now().day
-                  ]),
-                  unit: Unit.day,
-                  asFloat: true);
 
               if (load) {
                 return const Center(
@@ -123,12 +86,62 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
                   ],
                 );
               }
+
+              final isLateTask = tasks
+                  .where((element) =>
+                      element.finishedAt != null &&
+                      Jiffy.parse(element.finishedAt.toString())
+                          .isBefore(Jiffy.parseFromList([
+                        DateTime.now().year,
+                        DateTime.now().month,
+                        DateTime.now().day,
+                        DateTime.now().hour,
+                        DateTime.now().minute,
+                        DateTime.now().second,
+                      ])))
+                  .toList();
+
+              final isTodayTask = tasks
+                  .where((element) =>
+                      element.finishedAt == null ||
+                      element.finishedAt != null &&
+                          Jiffy.parse(element.finishedAt.toString())
+                              .isAfter(Jiffy.parseFromList([
+                            DateTime.now().year,
+                            DateTime.now().month,
+                            DateTime.now().day,
+                            DateTime.now().hour,
+                            DateTime.now().minute,
+                            DateTime.now().second,
+                          ])) &&
+                          Jiffy.parse(element.finishedAt.toString())
+                              .isBefore(Jiffy.parseFromList([
+                            DateTime.now().year,
+                            DateTime.now().month,
+                            DateTime.now().day + 1,
+                          ])))
+                  .toList();
+
+              final firstWithDate = repository.tasks
+                  .where((element) => element.finishedAt != null);
+              final lastDay =
+                  Jiffy.parse(firstWithDate.last.finishedAt.toString());
+
+              final totalDays = lastDay.diff(
+                  Jiffy.parseFromList([
+                    DateTime.now().year,
+                    DateTime.now().month,
+                    DateTime.now().day
+                  ]),
+                  unit: Unit.day,
+                  asFloat: true);
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(16),
                       color: blue200,
                     ),
                     child: Padding(
@@ -142,92 +155,116 @@ class _homeBodyWidgetState extends State<homeBodyWidget> {
                       ),
                     ),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height - 200,
-                    child: RefreshIndicator(
-                      onRefresh: () async {},
-                      child: Column(
-                        children: [
-                          Flexible(
-                            fit: FlexFit.loose,
-                            child: ListView(
-                              children: [
-                                if (isLateTask.isNotEmpty)
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Atrasados",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      for (var task in isLateTask)
-                                        taskRowWidget(
-                                            task: task,
-                                            updatedChecked: updatedChecked)
-                                    ],
-                                  ),
-                                if (isTodayTask.isNotEmpty)
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      const Text(
-                                        "Hoje",
-                                        style: TextStyle(fontSize: 18),
-                                      ),
-                                      for (var task in isTodayTask)
-                                        taskRowWidget(
-                                            task: task,
-                                            updatedChecked: updatedChecked)
-                                    ],
-                                  ),
-                                for (var day = 1; day <= totalDays; day++)
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        Jiffy.parseFromList([
-                                          DateTime.now().year,
-                                          DateTime.now().month,
-                                          DateTime.now().day
-                                        ]).add(days: day).yMd,
-                                        style: const TextStyle(fontSize: 18),
-                                      ),
-                                      for (var task in tasks)
-                                        if (task.finishedAt != null &&
-                                            Jiffy.parseFromList([
-                                              task.finishedAt!.year,
-                                              task.finishedAt!.month,
-                                              task.finishedAt!.day
-                                            ]).isSame(Jiffy.parseFromList([
-                                              DateTime.now().year,
-                                              DateTime.now().month,
-                                              DateTime.now().day
-                                            ]).add(days: day)))
-                                          taskRowWidget(
-                                              task: task,
-                                              updatedChecked: updatedChecked)
-                                    ],
-                                  )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        if (isLateTask.isNotEmpty)
+                          InLastDays(
+                              isLateTask: isLateTask,
+                              updatedChecked: updatedChecked),
+                        if (isTodayTask.isNotEmpty)
+                          InToday(
+                              isLateTask: isTodayTask,
+                              updatedChecked: updatedChecked),
+                        for (var day = 1; day <= totalDays; day++)
+                          OthersDays(
+                              tasks: tasks,
+                              updatedChecked: updatedChecked,
+                              day: day)
+                      ],
                     ),
-                  )
+                  ),
                 ],
               );
             },
           ),
         ),
       ),
+    );
+  }
+}
+
+class InLastDays extends StatelessWidget {
+  const InLastDays(
+      {super.key, required this.isLateTask, required this.updatedChecked});
+
+  final List<Task> isLateTask;
+  final Function updatedChecked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Atrasados",
+          style: TextStyle(fontSize: 18),
+        ),
+        for (var task in isLateTask)
+          taskRowWidget(task: task, updatedChecked: updatedChecked)
+      ],
+    );
+  }
+}
+
+class InToday extends StatelessWidget {
+  const InToday(
+      {super.key, required this.isLateTask, required this.updatedChecked});
+
+  final List<Task> isLateTask;
+  final Function updatedChecked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Hoje",
+          style: TextStyle(fontSize: 18),
+        ),
+        for (var task in isLateTask)
+          taskRowWidget(task: task, updatedChecked: updatedChecked)
+      ],
+    );
+  }
+}
+
+class OthersDays extends StatelessWidget {
+  const OthersDays(
+      {super.key,
+      required this.tasks,
+      required this.updatedChecked,
+      required this.day});
+
+  final List<Task> tasks;
+  final int day;
+  final Function updatedChecked;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          dateFormatToTomorrow(dateToShow: DateTime.now(), addDay: day),
+          style: const TextStyle(
+            fontSize: 18,
+          ),
+        ),
+        for (var task in tasks)
+          if (task.finishedAt != null &&
+              Jiffy.parseFromList([
+                task.finishedAt!.year,
+                task.finishedAt!.month,
+                task.finishedAt!.day
+              ]).isSame(Jiffy.parseFromList([
+                DateTime.now().year,
+                DateTime.now().month,
+                DateTime.now().day
+              ]).add(days: day)))
+            taskRowWidget(task: task, updatedChecked: updatedChecked)
+      ],
     );
   }
 }
