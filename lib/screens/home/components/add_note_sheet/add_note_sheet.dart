@@ -5,10 +5,13 @@ import 'package:my_tasks/constants/colors.dart';
 import 'package:my_tasks/models/subtask/subtask_model.dart';
 import 'package:my_tasks/models/task/repository/task_repository.dart';
 import 'package:my_tasks/screens/home/components/add_note_sheet/components/add_subtask_row.dart';
+import 'package:my_tasks/screens/home/components/add_note_sheet/components/priority_buttom.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../models/subtask/repository/subtask_repository.dart';
 import '../../../../models/task/task_model.dart';
+import 'components/difficulty_buttom.dart';
 import 'components/expiration_buttom.dart';
 import 'components/subtask_row.dart';
 
@@ -86,6 +89,18 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
   changeTime(DateTime dateTime) {
     setState(() {
       task.expiresOn = dateTime;
+    });
+  }
+
+  changePriority(String priority) {
+    setState(() {
+      task.priority = priority;
+    });
+  }
+
+  changeDifficulty(String difficulty) {
+    setState(() {
+      task.difficulty = difficulty;
     });
   }
 
@@ -226,7 +241,15 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
                       ExpirationButtom(
                         task: task,
                         changeTime: changeTime,
-                      )
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      PriorityButtom(task: task, updateTask: changePriority),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      DifficultyButtom(task: task, updateTask: changeDifficulty)
                     ],
                   ),
                 ),
