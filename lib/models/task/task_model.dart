@@ -35,4 +35,14 @@ class Task {
     DateTime? expiresOn,
   })  : expiresOn = expiresOn ?? DateTime.now(),
         createdAt = createdAt ?? DateTime.now();
+
+  bool setDone() {
+    isDone = !isDone;
+    if (isDone == true) {
+      doneAt = DateTime.now();
+    } else {
+      doneAt = null;
+    }
+    return isDone;
+  }
 }

@@ -58,7 +58,6 @@ class _AddNoteSheetState extends State<AddNoteSheet> {
     for (var subtask in task.subtasks) {
       await context.read<SubtaskRepository>().save(subtask);
     }
-    await context.read<TaskRepository>().update(task);
 
     Navigator.of(context).pop();
   }
