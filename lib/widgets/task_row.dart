@@ -2,28 +2,54 @@
 
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:my_tasks/main.dart';
 import 'package:my_tasks/models/task/task_model.dart';
 import 'package:my_tasks/utils/date_format.dart';
+import 'package:my_tasks/widgets/subtask_row.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-
-import '../../../../../constants/colors.dart';
-import '../../open_bottom_sheet.dart';
+import '../constants/colors.dart';
+import '../screens/home/components/open_bottom_sheet.dart';
 
 class taskRowWidget extends StatefulWidget {
   final Task task;
-  final Function updatedChecked;
 
-  const taskRowWidget(
-      {super.key, required this.task, required this.updatedChecked});
+  const taskRowWidget({super.key, required this.task});
 
   @override
   State<taskRowWidget> createState() => _taskRowWidgetState();
 }
 
 class _taskRowWidgetState extends State<taskRowWidget> {
-  var isChecked = false;
+  late bool isChecked;
   var isOpen = false;
   var turns = 0.0;
+
+  void toggleIsDone() {
+    bool newStatus = widget.task.setDone();
+
+    taskRepository.taskBox.put(widget.task);
+
+    setState(() {
+      isChecked = newStatus;
+    });
+  }
+
+  void checkAllSubtaskIsDone() {
+    var getIsDone =
+        widget.task.subtasks.where((element) => element.isDone == true);
+    if (getIsDone.length == widget.task.subtasks.length) {
+      toggleIsDone();
+    } else if (getIsDone.length == widget.task.subtasks.length - 1 &&
+        isChecked == true) {
+      toggleIsDone();
+    }
+  }
+
+  @override
+  void initState() {
+    isChecked = widget.task.isDone;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +64,9 @@ class _taskRowWidgetState extends State<taskRowWidget> {
             ? null
             : () {
                 openBottomSheet(
-                    context: context,
-                    task: widget.task,
-                    updatedChecked: widget.updatedChecked);
+                  context: context,
+                  task: widget.task,
+                );
               },
         shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(24))),
@@ -94,43 +120,9 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                       shrinkWrap: true,
                       itemCount: widget.task.subtasks.length,
                       itemBuilder: (context, index) {
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              Transform.scale(
-                                scale: 1.4,
-                                child: Container(
-                                  width: 18,
-                                  height: 18,
-                                  decoration: BoxDecoration(
-                                      color: gray300,
-                                      borderRadius: BorderRadius.circular(6)),
-                                  child: Checkbox(
-                                    checkColor: gray100,
-                                    fillColor: widget
-                                            .task.subtasks[index].isDone
-                                        ? MaterialStateProperty.all(blue200)
-                                        : MaterialStateProperty.all(gray300),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(6)),
-                                    value: widget.task.subtasks[index].isDone,
-                                    onChanged: (bool? value) {
-                                      setState(() {
-                                        widget.task.subtasks[index].isDone =
-                                            value!;
-                                        widget.updatedChecked(widget.task);
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 10,
-                              ),
-                              Text(widget.task.subtasks[index].title)
-                            ],
-                          ),
+                        return SubTaskRow(
+                          subtask: widget.task.subtasks[index],
+                          verifyAllSubtaskIsDone: checkAllSubtaskIsDone,
                         );
                       },
                     ),
@@ -165,15 +157,9 @@ class _taskRowWidgetState extends State<taskRowWidget> {
                         : MaterialStateProperty.all(gray300),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(6)),
-                    value: widget.task.isDone,
+                    value: isChecked,
                     onChanged: (bool? value) {
-                      widget.task.isDone = value!;
-                      if (value == true) {
-                        widget.task.doneAt = DateTime.now();
-                      } else {
-                        widget.task.doneAt = null;
-                      }
-                      widget.updatedChecked(widget.task);
+                      toggleIsDone();
                     },
                   ),
                 ),

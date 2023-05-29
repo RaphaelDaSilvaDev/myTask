@@ -7,4 +7,9 @@ class SubTask {
   bool isDone;
 
   SubTask({this.id = 0, this.isDone = false, required this.title});
+
+  bool toggleIsDone() {
+    isDone = !isDone;
+    return isDone;
+  }
 }
